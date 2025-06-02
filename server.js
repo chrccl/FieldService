@@ -337,14 +337,42 @@ app.post('/api/process-report', upload.any(), async (req, res) => {
 
       TESTI ESTRATTI DA IMMAGINI: ${extractedImageTexts.map(img => `${img.filename}: ${img.extractedText}`).join('\n')}
 
-      COMPITO: Analizza il problema descritto e fornisci:
-      1. Una descrizione chiara del problema identificato
-      2. La soluzione che l'operatore ha già applicato (se menzionata)
-      3. Soluzioni dettagliate raccomandate con passaggi specifici, priorità, tempo stimato e strumenti necessari; 
-          ma soprattutto: una descrizione esaustiva del problema e della soluzione proposta, descrivendo 
-          nei minimi dettagli ciò che si deve fare per risolvere il problema o l'esercizio.
-      4. Raccomandazioni aggiuntive per prevenire problemi futuri
-      5. Un riepilogo professionale per il management
+      ISTRUZIONI DETTAGLIATE:
+      Fornisci un'analisi professionale e completa che includa:
+
+      1. IDENTIFICAZIONE DEL PROBLEMA:
+        - Descrizione tecnica dettagliata
+        - Cause probabili (primarie e secondarie)
+        - Impatto operativo e conseguenze
+        - Classificazione del livello di criticità
+
+      2. ANALISI DELLA SOLUZIONE APPLICATA:
+        - Valutazione dell'efficacia della soluzione dell'operatore
+        - Eventuali rischi o limitazioni
+        - Suggerimenti per ottimizzazioni
+
+      3. SOLUZIONI RACCOMANDATE (almeno 2-3 opzioni):
+        Per ogni soluzione fornisci:
+        - Descrizione tecnica completa (minimo 100 parole)
+        - Passaggi operativi specifici e dettagliati
+        - Materiali/strumenti necessari con specifiche tecniche
+        - Tempo di implementazione realistico
+        - Costi stimati (quando applicabile)
+        - Livello di competenza richiesto
+        - Rischi associati e precauzioni di sicurezza
+        - Verifiche post-implementazione
+
+      4. ANALISI PREVENTIVA:
+        - Cause radice del problema
+        - Strategie di prevenzione specifiche
+        - Controlli periodici raccomandati
+        - Indicatori di allarme precoce
+
+      5. IMPATTO AZIENDALE:
+        - Analisi costi-benefici
+        - Tempo di fermo operativo
+        - Risorse necessarie
+        - Priorità di intervento
 
       Rispondi in formato JSON con questa struttura:
       {
@@ -388,7 +416,7 @@ app.post('/api/process-report', upload.any(), async (req, res) => {
           messages: [
             {
               role: "system",
-              content: "Sei un assistente esperto nell'analisi di problemi tecnici e professionali. Rispondi sempre in italiano e fornisci analisi dettagliate e professionali."
+              content: "Sei un assistente esperto nell'analisi di problemi tecnici e professionali. Rispondi sempre in italiano e fornisci analisi dettagliate, esaustive e professionali."
             },
             {
               role: "user",
