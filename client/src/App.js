@@ -378,14 +378,64 @@ const ProfessionalProblemReporter = () => {
                   <p className="text-gray-700 font-medium">{report.userSolution}</p>
                 </div>
 
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-2">Raccomandazioni AI:</h3>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1">
-                    {report.aiRecommendations.map((rec, index) => (
-                      <li key={index}>{rec}</li>
-                    ))}
-                  </ul>
-                </div>
+                {report.detailedSolutions && report.detailedSolutions.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-800 mb-3">Soluzioni Raccomandate:</h3>
+                    <div className="space-y-4">
+                      {report.detailedSolutions.map((solution, index) => (
+                        <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium text-gray-800">{solution.title}</h4>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              solution.priority === 'alta' ? 'bg-red-100 text-red-800' :
+                              solution.priority === 'media' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              Priorità {solution.priority}
+                            </span>
+                          </div>
+                          
+                          <p className="text-gray-700 mb-3">{solution.description}</p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                            <div>
+                              <span className="font-medium text-gray-600">Tempo stimato:</span>
+                              <span className="text-gray-700 ml-2">{solution.estimatedTime}</span>
+                            </div>
+                            {solution.requiredTools && solution.requiredTools.length > 0 && (
+                              <div>
+                                <span className="font-medium text-gray-600">Strumenti:</span>
+                                <span className="text-gray-700 ml-2">{solution.requiredTools.join(', ')}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {solution.steps && solution.steps.length > 0 && (
+                            <div>
+                              <h5 className="font-medium text-gray-700 mb-2">Passaggi:</h5>
+                              <ol className="list-decimal list-inside text-gray-700 space-y-1">
+                                {solution.steps.map((step, stepIndex) => (
+                                  <li key={stepIndex}>{step}</li>
+                                ))}
+                              </ol>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {report.preventiveRecommendations && report.preventiveRecommendations.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-800 mb-2">Raccomandazioni Preventive:</h3>
+                    <ul className="list-disc list-inside text-gray-700 space-y-1">
+                      {report.preventiveRecommendations.map((rec, index) => (
+                        <li key={index}>{rec}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-2">Riepilogo Gestionale:</h3>

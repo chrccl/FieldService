@@ -92,22 +92,35 @@ app.post('/api/process-report', upload.any(), async (req, res) => {
     // Prepare context for GPT analysis
     const analysisContext = `
     CONTESTO: Analisi di un problema professionale riportato da un operatore/tecnico.
-    
+
     TRASCRIZIONE AUDIO: "${audioTranscription}"
-    
+
     FILE ALLEGATI: ${fileAnalyses.map(f => `- ${f.name} (${f.type})`).join('\n')}
-    
+
     COMPITO: Analizza il problema descritto e fornisci:
     1. Una descrizione chiara del problema identificato
     2. La soluzione che l'operatore ha già applicato (se menzionata)
-    3. Raccomandazioni aggiuntive per risolvere completamente il problema
-    4. Un riepilogo professionale per il management
-    
+    3. Soluzioni dettagliate raccomandate con passaggi specifici, priorità, tempo stimato e strumenti necessari.
+        La spiegazione deve essere professionale e tecnica, ma soprattutto esaustiva per un operatore tecnico
+        e completa di ogni passaggio.
+    4. Raccomandazioni aggiuntive per prevenire problemi futuri
+    5. Un riepilogo professionale per il management
+
     Rispondi in formato JSON con questa struttura:
     {
       "problemDescription": "descrizione del problema",
       "userSolution": "soluzione applicata dall'operatore o null se non menzionata",
-      "recommendations": ["raccomandazione1", "raccomandazione2", ...],
+      "detailedSolutions": [
+        {
+          "title": "Titolo della soluzione",
+          "description": "Descrizione dettagliata",
+          "steps": ["Passo 1", "Passo 2", "Passo 3"],
+          "priority": "alta/media/bassa",
+          "estimatedTime": "tempo stimato",
+          "requiredTools": ["strumento1", "strumento2"]
+        }
+      ],
+      "preventiveRecommendations": ["raccomandazione1", "raccomandazione2"],
       "managementSummary": "riepilogo per il management"
     }
     `;
@@ -116,7 +129,17 @@ app.post('/api/process-report', upload.any(), async (req, res) => {
     let aiAnalysis = {
       problemDescription: "Problema generico rilevato",
       userSolution: null,
-      recommendations: ["Approfondire l'analisi", "Monitorare la situazione"],
+      detailedSolutions: [
+        {
+          title: "Soluzione generica",
+          description: "Analisi più approfondita necessaria",
+          steps: ["Identificare la causa", "Applicare correzione", "Verificare risultato"],
+          priority: "media",
+          estimatedTime: "30-60 minuti",
+          requiredTools: ["Strumenti standard"]
+        }
+      ],
+      preventiveRecommendations: ["Monitorare la situazione", "Controlli periodici"],
       managementSummary: "Problema segnalato e in fase di risoluzione"
     };
 
@@ -160,7 +183,8 @@ app.post('/api/process-report', upload.any(), async (req, res) => {
       filesAnalyzed: fileAnalyses,
       problemDescription: aiAnalysis.problemDescription,
       userSolution: aiAnalysis.userSolution,
-      aiRecommendations: aiAnalysis.recommendations,
+      detailedSolutions: aiAnalysis.detailedSolutions,
+      preventiveRecommendations: aiAnalysis.preventiveRecommendations,
       managementSummary: aiAnalysis.managementSummary
     };
 
@@ -224,16 +248,52 @@ app.post('/api/generate-pdf', express.json(), async (req, res) => {
       doc.moveDown(2);
     }
 
-    // AI Recommendations
-    if (report.aiRecommendations && report.aiRecommendations.length > 0) {
-      doc.fontSize(16).text('RACCOMANDAZIONI AGGIUNTIVE:', { underline: true });
+    // Detailed Solutions
+    if (report.detailedSolutions && report.detailedSolutions.length > 0) {
+      doc.fontSize(16).text('SOLUZIONI RACCOMANDATE:', { underline: true });
       doc.moveDown(0.5);
-      report.aiRecommendations.forEach((rec, index) => {
+      
+      report.detailedSolutions.forEach((solution, index) => {
+        doc.fontSize(14).text(`${index + 1}. ${solution.title}`, { underline: true });
+        doc.moveDown(0.3);
+        
+        doc.fontSize(12).text(`Priorità: ${solution.priority.toUpperCase()}`, { continued: true });
+        doc.text(` | Tempo stimato: ${solution.estimatedTime}`, { align: 'left' });
+        doc.moveDown(0.3);
+        
+        doc.fontSize(12).text('Descrizione:', { underline: true });
+        doc.text(solution.description, { align: 'justify' });
+        doc.moveDown(0.3);
+        
+        if (solution.steps && solution.steps.length > 0) {
+          doc.fontSize(12).text('Passaggi:', { underline: true });
+          solution.steps.forEach((step, stepIndex) => {
+            doc.text(`   ${stepIndex + 1}. ${step}`);
+          });
+          doc.moveDown(0.3);
+        }
+        
+        if (solution.requiredTools && solution.requiredTools.length > 0) {
+          doc.fontSize(12).text('Strumenti necessari:', { underline: true });
+          doc.text(`   ${solution.requiredTools.join(', ')}`);
+          doc.moveDown(0.3);
+        }
+        
+        doc.moveDown(1);
+      });
+      doc.moveDown(1);
+    }
+
+    // AI Recommendations
+    if (report.preventiveRecommendations && report.preventiveRecommendations.length > 0) {
+      doc.fontSize(16).text('RACCOMANDAZIONI PREVENTIVE:', { underline: true });
+      doc.moveDown(0.5);
+      report.preventiveRecommendations.forEach((rec, index) => {
         doc.fontSize(12).text(`${index + 1}. ${rec}`, { align: 'justify' });
         doc.moveDown(0.3);
       });
       doc.moveDown(1);
-    }
+}
 
     // Management Summary
     if (report.managementSummary) {
