@@ -25,11 +25,15 @@
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "cors": "^2.8.5",
+    "docx": "^8.5.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "mammoth": "^1.9.1",
     "multer": "^1.4.5-lts.1",
     "openai": "^4.20.1",
-    "pdfkit": "^0.13.0"
+    "pdfkit": "^0.13.0",
+    "sharp": "^0.33.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
