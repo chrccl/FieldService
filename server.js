@@ -57,10 +57,11 @@ const extractTextFromImage = async (imageBuffer) => {
   try {
     // Convert image to base64
     const base64Image = imageBuffer.toString('base64');
-    const mimeType = 'image/jpeg'; // Assume JPEG, could be made dynamic
-    
+    const mimeType = 'image/jpeg'; // or detect dynamically
+
     const response = await openai.chat.completions.create({
-      model: "gpt-4-vision-preview",
+      // Use a supported vision model. For instance, “gpt-4o” (GPT-4o) or “gpt-4o-mini”
+      model: "gpt-4o",
       messages: [
         {
           role: "user",
@@ -70,6 +71,7 @@ const extractTextFromImage = async (imageBuffer) => {
               text: "Estrai tutto il testo visibile in questa immagine. Se ci sono tabelle, mantieni la struttura. Rispondi solo con il testo estratto, senza commenti aggiuntivi."
             },
             {
+              // Embedding the image as base64 via data URL
               type: "image_url",
               image_url: {
                 url: `data:${mimeType};base64,${base64Image}`
@@ -84,9 +86,10 @@ const extractTextFromImage = async (imageBuffer) => {
     return response.choices[0].message.content;
   } catch (error) {
     console.error('Image text extraction error:', error);
-    return '[Impossibile estrarre testo dall\'immagine]';
+    return "[Impossibile estrarre testo dall'immagine]";
   }
 };
+
 
 // Helper function to read Excel file
 const readExcelFile = (buffer) => {
@@ -337,7 +340,9 @@ app.post('/api/process-report', upload.any(), async (req, res) => {
       COMPITO: Analizza il problema descritto e fornisci:
       1. Una descrizione chiara del problema identificato
       2. La soluzione che l'operatore ha già applicato (se menzionata)
-      3. Soluzioni dettagliate raccomandate con passaggi specifici, priorità, tempo stimato e strumenti necessari
+      3. Soluzioni dettagliate raccomandate con passaggi specifici, priorità, tempo stimato e strumenti necessari; 
+          ma soprattutto: una descrizione esaustiva del problema e della soluzione proposta, descrivendo 
+          nei minimi dettagli ciò che si deve fare per risolvere il problema o l'esercizio.
       4. Raccomandazioni aggiuntive per prevenire problemi futuri
       5. Un riepilogo professionale per il management
 
